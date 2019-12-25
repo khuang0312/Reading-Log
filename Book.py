@@ -74,6 +74,29 @@ class Book:
         '''Returns a string that creates the same Book object when evaluated'''
         return f'Book({self.title}, {self.author}, {self.start_date}, {self.end_date}, {self.medium}, {self.completed}, {self.notes})'
 
+    def set_title(self, new_title : str):
+        '''Sets a book's title to the new one'''
+        assert isinstance(new_title, str), "Argument must be a string."
+        self.title = new_title
+
+    def set_author(self, new_author : str):
+        '''Sets a book's author to the new one'''
+        assert isinstance(new_author, str), "Argument must be a string."
+        self.author = new_author
+
+    def set_medium(self, new_medium : str):
+        '''Sets a book's medium to the new one'''
+        assert new_medium in Book.MEDIUM, "Argument must be either \'picture\', \'print\', \'comic\', or \'audio\'."
+        self.medium = new_medium
+
+    def set_notes(self, notes : str):
+        '''Sets book's notes to the new one
+            
+           Notes are only 1000 characters long to prevent the logs from getting too big.
+        '''
+        assert isinstance(notes, str) and len(notes) <= 1000, "Argument must be a string of 1000 or less characters."
+        self.notes = notes
+
     def set_completed(self, completed : bool):
         '''Sets a book's completion status
             
@@ -89,29 +112,6 @@ class Book:
 
         self.completed = completed
     
-    def set_title(self, new_title : str):
-        '''Sets a book's title to the new one'''
-        assert isinstance(new_title, str), "Argument must be a string."
-        self.title = new_title
-
-    def set_author(self, new_author : str):
-        '''Sets a book's author to the new one'''
-        assert isinstance(new_author, str), "Argument must be a string."
-        self.author = new_author
-
-    def set_medium(self, new_medium : str):
-        '''Sets a book's medium to the new one'''
-        assert new_medium in Book.MEDIUM, "Argument must be either \'picture\', \'print\', \'comic\', or \'audio\'."
-        self.medium = new_medsertEqual() are summarized in the following table. Note that it’s usually not necessary to invoke these meium
-
-    def set_notes(self, notes : str):
-        '''Sets book's notes to the new one
-            
-           Notes are only 1000 characters long to prevent the logs from getting too big.
-        '''
-        assert isinstance(notes, str) and len(notes) <= 1000, "Argument must be a string of 1000 or less characters."
-        self.notes = notes
-
     def set_date(self, month : int, day : int, year : int, hour : int=0, minute: int=0, second: int=0, start : bool=True):
         '''Sets either a book's start date or end date to a new one.
             
@@ -146,7 +146,7 @@ class Book:
         'L' – little-endian (day, month, year), e.g. 22.04.2006 or 22/4/2006 or 22-04-2006 or 22 April 2006
         'M' – middle-endian (month, day, year), e.g. 04/22/2006 or April 22, 2006
         
-        year:
+sertEqual() are summarized in the following table. Note that it’s usually not necessary to invoke these me        year:
         'yy' – two-digit year, e.g. 06
         'yyyy' – four-digit year, e.g. 2006
         

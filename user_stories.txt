@@ -5,6 +5,8 @@ Problems:
 Need to prevent the user from using erroneous values to set the dates.
 Need to prevent the user from setting a end date that is before a start date.
 
+What happens if the user puts multiple occurences of the same book? Should it be counted?
+ Multiple occurrences of the same book can be in the same log; however, the second and subsequent occurrences are not counted toward the total count of books read.
 
 In-Progress:
 When I look at a book in my log, I should be able to see the date I started reading it, the date I finished reading it, how long I have spent reading it in seconds, and
@@ -17,6 +19,15 @@ I should be able to add new books to my list.
 I should be able to delete books from my list.
 
 I should be able to check which books I am still reading and which books I have finished.
+
+I should be able to see the following analytics...
+  The medium percentages
+  The genre percentages... (this could probably be added via tags)
+  The completion perecentages)
+  
+  The average time spent reading a book    (week, month, year, 2 years, all time)
+  Total books read within a certain period (week, month, year, 2 years, all time)
+  Total time spent within a certain period (week, month, year, 2 years, all time)
 
 If I put my name and a given time period, the program should give me a list of books that I have read within that time period.
 

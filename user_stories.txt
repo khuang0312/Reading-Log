@@ -1,0 +1,30 @@
+Finished:
+When I add a book to my log, I should be able to say the title of the book, who wrote the book, and whether it's a picture, print, comic, or audio book.
+
+Problems:
+Need to prevent the user from using erroneous values to set the dates.
+Need to prevent the user from setting a end date that is before a start date.
+
+
+In-Progress:
+When I look at a book in my log, I should be able to see the date I started reading it, the date I finished reading it, how long I have spent reading it in seconds, and
+any other notes that I have written about the book.
+
+I should be able to modify the title, author, medium, date started, date finished, time spent, the notes, and the completion status of the book.
+
+I should be able to add new books to my list.
+
+I should be able to delete books from my list.
+
+I should be able to check which books I am still reading and which books I have finished.
+
+If I put my name and a given time period, the program should give me a list of books that I have read within that time period.
+
+I should be able to transfer the data to another instance of this program.
+
+The program should be able to read from a CSV file and create a reading log based off of that.
+
+I should be able to get a nice readout of my data, so I can share with my friends what books I have read.
+
+I should be able to purge all data.
+

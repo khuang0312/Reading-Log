@@ -1,45 +1,47 @@
 #This module contains the Book class which describes each book in a user's
 #   reading list.
 
-from time import gmtime, strptime, strftime
+from time import gmtime, strptime, strftime, struct_time
 
 
 class Book:
     #DATE_FORMAT is a static variable made to help format the date that a book is read
 
-    DATE_FORMAT = {
-        #year specifier
-        'y' : '%y',
-        'yyyy' : '%Y',
-        
-        #month specifiers
+    YEAR_FORMAT = {
+        'yy' : '%y',
+        'yyyy' : '%Y'
+    }
+
+    MONTH_FORMAT = {
         'm' : '%m',
         'mm' : '%m',
         'mmm' : '%b',
-        'mmmm' : '%B',
-        
-        #day specifiers
-        'd' : '%d',
-        'dd' : '%d',
+        'mmmm' : '%B'
+    }
 
-        #endian specifier
-        'B' : None,
-        'L' : None,
-        'M' : None,
+    DAY_FORMAT = {
+        'd':  '%d',
+        'dd': '%d'
+    }
+
+    WEEKDAY_FORMAT = {
+        'ddd' : '%a',
+        'dddd': '%A',
+        '' : ''
+    }
+    
+    ENDIAN_FORMAT = ['B', 'L', 'M']
+
+    SEPARATOR_FORMAT = ['/', '.', '-', ' ']
         
-        #seperator specifier
-        '/' : None,
-        '.' : None,
-        '-' : None,
-        ' ' : None 
-        }
     
     #MEDIUM is a static variable to help set the medium...
     MEDIUM = {
-        "picture" : "Picture Book",
-        "print"   : "Print Book",
-        "comic"   : "Comic",
-        "audio"   : "Audio Book"
+        "picture"    : "Picture Book",
+        "print"      : "Print Book",
+        "comic"      : "Comic",
+        "audio"      : "Audio Book",
+        "fanfiction" : "Fanfiction"
         }
 
     def __init__(self, title : str="Untitled", author : str="Unknown", medium : str="print", notes : str="", completed : bool=False):
@@ -65,7 +67,12 @@ class Book:
         self.title = title
         self.author = author
         self.start_date = gmtime()
-        self.end_date = self.start_date
+        
+        if completed: 
+            self.end_date = self.start_date  #the end date is the start date in case a new Book is created with completed being true...
+        else:
+            self.end_date = None             #the end date is none in all other circumstances...
+
         self.medium = medium
         self.notes = notes
         self.completed = completed
@@ -97,22 +104,17 @@ class Book:
         assert isinstance(notes, str) and len(notes) <= 1000, "Argument must be a string of 1000 or less characters."
         self.notes = notes
 
-    def set_completed(self, completed : bool):
-        '''Sets a book's completion status
-            
-           If we want to mark a book as finished, the end_date is initialized to the date that this method is executed.
-           If we want to mark a book as incomplete, we reinitialize the end_date to the start_date.
-        '''
-        assert isinstance(completed, bool), "Argument must be a bool."
-        
-        if completed == True:
-            self.end_date = gmtime()
-        else:
-            self.end_date = start_date()
-
-        self.completed = completed
+    def set_completed(self):
+        '''Sets a book's completion status to True and sets the end time to the time when this method is called'''
+        self.completed = True
+        self.end_date = gmtime()
     
-    def set_date(self, month : int, day : int, year : int, hour : int=0, minute: int=0, second: int=0, start : bool=True):
+    def set_incomplete(self):
+        '''Sets a book's completion status to False and resets the end time back to None'''
+        self.completed = False
+        self.end_time = None
+    
+    def set_date(self, month: int=1, day : int=1, year : int=1, hour : int=0, minute: int=0, second: int=0, start : bool=True):
         '''Sets either a book's start date or end date to a new one.
             
            If start is True, this will change the starting date. Otherwise, the ending date.
@@ -129,14 +131,20 @@ class Book:
            January 1st, 2020, 12:00:00AM
            January 1st, 2020, 00:00:00
         '''
-        date = str(hour) + ':' + str(minute) + ':' + str(second) + ', ' + str(month) + ' ' + str(day) + ', ' + str(year)
+        #Add error checking for the month, day, and year...
+        date = "{:0>2}:{:0>2}:{:0>2}, {:0>2}/{:0>2}/{}".format(hour, minute, second, month, day, year)
         
+        print(date) #DEBUG
+
+
         if start == True:
-            self.start_date = strptime(date, "%h:%M:%S, %b %d, %Y")
+            #add check for if new start time < end time
+            self.start_date = strptime(date, "%H:%M:%S, %m/%d/%Y")
         else:
-            self.end_date = strptime(date, "%h:%M:%S, %b %d, %Y")
+            #add check for if new end time > start time
+            self.end_date = strptime(date, "%H:%M:%S, %b %d, %Y")
    
-    def print_date(self, endian='M', year='yyyy', month='mm', day='dd', separator='/', start=True) -> str:
+    def print_date(self, endian='M', year='yyyy', month='mm', day='dd', weekday='', separator='/', start=True) -> str:
         '''Returns a string representation of the date
         
         Keyword arugments:
@@ -146,7 +154,7 @@ class Book:
         'L' – little-endian (day, month, year), e.g. 22.04.2006 or 22/4/2006 or 22-04-2006 or 22 April 2006
         'M' – middle-endian (month, day, year), e.g. 04/22/2006 or April 22, 2006
         
-sertEqual() are summarized in the following table. Note that it’s usually not necessary to invoke these me        year:
+        year:
         'yy' – two-digit year, e.g. 06
         'yyyy' – four-digit year, e.g. 2006
         
@@ -159,8 +167,11 @@ sertEqual() are summarized in the following table. Note that it’s usually not 
         day:
         'd' – one-digit day of the month for days below 10, e.g. 2
         'dd' – two-digit day of the month, e.g. 02
+
+        weekday:
+        ''    -- nothing happens.
         'ddd' – three-letter abbreviation for day of the week, e.g. Tue
-        'dddd' – day of the week spelled out in full, e.g. Tuesday
+        'dddd' – day of the week spelled out in full, e.g. Tuesday      
         
         Separators of the components:
         "/" – stroke (slash)
@@ -172,27 +183,49 @@ sertEqual() are summarized in the following table. Note that it’s usually not 
         True - start date of the book
         False - end date of the book
         '''
-        assert endian in Book.DATE_FORMAT, 'Argument \'endian\' must be either \'B\', \'M\', or \'L\'. '
-        assert year in Book.DATE_FORMAT, 'Argument \'year\' must be either \'yy\' or \'yyyy\'.'
-        assert month in Book.DATE_FORMAT, 'Argument \'month\' must be either \'mmmm\', \'mmm\', \'mm\', or \'m\'.'
-        assert day in Book.DATE_FORMAT, 'Argument \'day\' must either be \'d\' or \'dd\'.'
-        assert separator in Book.DATE_FORMAT, 'Argument \'seperator\' must either be \'/\', \'.\', \'-\', or \' \'.'
+        assert endian in Book.ENDIAN_FORMAT, 'Argument \'endian\' must be either \'B\', \'M\', or \'L\'. '
+        assert year in Book.YEAR_FORMAT, 'Argument \'year\' must be either \'yy\' or \'yyyy\'.'
+        assert month in Book.MONTH_FORMAT, 'Argument \'month\' must be either \'mmmm\', \'mmm\', \'mm\', or \'m\'.'
+        assert day in Book.DAY_FORMAT, 'Argument \'day\' must either be \'d\' or \'dd\'.'
+        assert weekday in Book.WEEKDAY_FORMAT, 'Argument \'weekday\' must either be \'\', \'ddd\' or \'dddd\''
+        assert separator in Book.SEPARATOR_FORMAT, 'Argument \'seperator\' must either be \'/\', \'.\', \'-\', or \' \'.'
 
-        year_format = Book.DATE_FORMAT[year]
-        month_format = Book.DATE_FORMAT[month]
-        day_format = Book.DATE_FORMAT[day]
+        year_format = Book.YEAR_FORMAT[year]
+        month_format = Book.MONTH_FORMAT[month]
+        day_format = Book.DAY_FORMAT[day]
+        weekday_format = Book.WEEKDAY_FORMAT[weekday]
         
+        if start == True:
+            year_string = strftime(year_format, self.start_date)
+            month_string = strftime(month_format, self.start_date)
+            day_string = strftime(day_format, self.start_date)                #we want the day number in all cases... 
+            weekday_string = strftime(weekday_format, self.start_date) + ', ' if weekday_format != '' else '' 
+        
+        elif self.end_date != None:
+            year_string = strftime(year_format, self.end_date)
+            month_string = strftime(month_format, self.end_date)
+            day_string = strftime(day_format, self.end_date)
+            weekday_string = strftime(weekday_format, self.end_date) + ', ' if weekday_format != '' else '' 
+
+        #to change the length of the day or month to 1
+        if month == 'm':
+            month_string = month_string[-1] if int(month_string) < 10 else month_string
+        if day == 'd':
+            day_string = day_string[-1] if int(day_string) < 10 else day_string
+        
+        #order it based on endian
         if endian == 'B':
-            date_format = year_format + separator + month_format + separator + day_format
+            date_string = weekday_string + year_string + separator + month_string + separator + day_string
 
         elif endian == 'L':
-            date_format = day_format + separator +  month_format + separator + year_format
+            date_string = weekday_string + day_string + separator + month_string + separator + year_string
 
         elif endian == 'M':
-            date_format = month_format + separator + day_format + separator + year_format
+            date_string = weekday_string + month_string + separator + day_string + separator + year_string
+       
+        print(date_string) 
+        return date_string
         
-        
-        return strftime(date_format, self.start_date) if start == True else strftime(date_format, self.end_date)
     
     def get_title(self) -> str:
         '''returns the title of the book'''
@@ -210,14 +243,14 @@ sertEqual() are summarized in the following table. Note that it’s usually not 
         '''returns the notes associated with a book'''
         return self.notes
 
-    def get_completed(self) -> str:
+    def get_completed(self) -> bool:
         '''returns whether the book has been completed'''
         return self.completed
 
-    def get_start_date(self) -> str:
+    def get_start_date(self) -> struct_time:
         '''returns when the user started reading the book'''
         return self.start_date
 
-    def get_end_date(self) -> str:
+    def get_end_date(self) -> struct_time:
         '''returns when the user has finished the book'''
-        return self.end_date
+        return self.end_date if self.completed else None 

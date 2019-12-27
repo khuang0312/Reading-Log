@@ -1,5 +1,5 @@
-#This module contains the Book class which describes each book in a user's
-#   reading list.
+#This module contains the Book class which describes each book in a user's reading list.
+#Kevin Huang
 
 from time import gmtime, strptime, strftime, struct_time
 
@@ -81,14 +81,22 @@ class Book:
         '''Returns a string that creates the same Book object when evaluated'''
         return f'Book({self.title}, {self.author}, {self.start_date}, {self.end_date}, {self.medium}, {self.completed}, {self.notes})'
 
+    def __eq__(self, other):
+        '''A Book object is the same as another if they both have the same author and title.'''
+        return isinstance(other, Book) and self.title == other.title and self.author == other.author
+
+    def __ne__(self, other):
+        '''A Book object is not equal to anything other than another Book object with the same author and title''' 
+        return not self.__eq__(other)
+
     def set_title(self, new_title : str):
         '''Sets a book's title to the new one'''
-        assert isinstance(new_title, str), "Argument must be a string."
+        assert isinstance(new_title, str) and new_title != "", "Argument must be a non-empty string."
         self.title = new_title
 
     def set_author(self, new_author : str):
         '''Sets a book's author to the new one'''
-        assert isinstance(new_author, str), "Argument must be a string."
+        assert isinstance(new_author, str) and new_author != "", "Argument must be a non-empty string."
         self.author = new_author
 
     def set_medium(self, new_medium : str):
@@ -131,18 +139,25 @@ class Book:
            January 1st, 2020, 12:00:00AM
            January 1st, 2020, 00:00:00
         '''
-        #Add error checking for the month, day, and year...
-        date = "{:0>2}:{:0>2}:{:0>2}, {:0>2}/{:0>2}/{}".format(hour, minute, second, month, day, year)
-        
-        print(date) #DEBUG
+        assert 1 <= month <= 12, 'Argument \'month\' must be a integer from 1 to 12.'
+        assert 1 <= day <= 31, 'Argument \'day\' must be an intger from 1 to 31.'
+        assert 0 <= hour <= 23, 'Argument \'hour\' must be an integer from 0 to 24.'
+        assert 0 <= minute <= 59, 'Argument \'minute\' must be an integer from 0 to 59'
+        assert 0 <= second <=  59, 'Argument \'second\' must be an integer from 0 to 59'
+        assert isinstance(start, bool), 'Argument \'start\' must be a bool.'
 
+
+        date = "{:0>2}:{:0>2}:{:0>2}, {:0>2}/{:0>2}/{}".format(hour, minute, second, month, day, year) 
+        new_date = strptime(date, "%H:%M:%S, %m/%d/%Y")
 
         if start == True:
-            #add check for if new start time < end time
-            self.start_date = strptime(date, "%H:%M:%S, %m/%d/%Y")
-        else:
-            #add check for if new end time > start time
-            self.end_date = strptime(date, "%H:%M:%S, %b %d, %Y")
+            if self.end_date == None:
+                self.start_date = new_date 
+            elif new_date < self.end_date:
+                self.start_date = new_date
+
+        elif start == False and new_date > self.start_date:
+            self.end_date = new_date
    
     def print_date(self, endian='M', year='yyyy', month='mm', day='dd', weekday='', separator='/', start=True) -> str:
         '''Returns a string representation of the date
@@ -215,6 +230,7 @@ class Book:
         
         #order it based on endian
         if endian == 'B':
+            #modify the date_string based on the seperator...
             date_string = weekday_string + year_string + separator + month_string + separator + day_string
 
         elif endian == 'L':
@@ -223,7 +239,7 @@ class Book:
         elif endian == 'M':
             date_string = weekday_string + month_string + separator + day_string + separator + year_string
        
-        print(date_string) 
+        print(date_string) #DEBUG 
         return date_string
         
     

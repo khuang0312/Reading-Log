@@ -16,6 +16,34 @@ class Test(unittest.TestCase):
         self.assertRaises(AssertionError, Book, medium=2);
         self.assertRaises(AssertionError, Book, completed=2);
 
+    def test_books_with_the_same_title_and_author_are_equal(self):
+        b = Book(title = "Oliver Twist",
+                 author = "Charles Dickens",
+                 medium = "comic"
+                 )
+        c = Book(title = "Oliver Twist",
+                 author = "Charles Dickens",
+                 medium = "print"
+                 )
+        self.assertEqual(b, c)
+
+    def test_books_with_neither_the_same_title_and_author_are_not_equal(self):
+        b = Book(title = "Oliver Twist",
+                 author = "Charles Dickens"
+                 )
+        c = Book(title = "Great Expectations",
+                 author = "Charles Dickens"
+                 )
+        self.assertNotEqual(b, c)
+
+        b = Book(title = "Oliver Twist",
+                 author = "Charles Dickens"
+                 )
+        c = Book(title = "Oliver Twist",
+                 author = "Jane Austen"
+                 )
+        self.assertNotEqual(b, c)
+
     def test_getters_of_new_book(self):
        b = Book(
             title = "Bleach #1 - Strawberry and the Soul Reapers",
@@ -60,6 +88,17 @@ class Test(unittest.TestCase):
         #big endian with one digit day
         b.set_date(month=9, day=8, year=2020)
         self.assertEqual("2020/09/8", b.print_date(endian='B', year='yyyy', month='mm', day='d', separator='/', start=True))
+    
+    def test_little_endian(self):
+        #convention little endian
+
+        #little endian with a weekday
+        #little endian with two digit year
+        #little endian with a three letter month
+        #little endian with full month
+        #little endian with one digit month
+        #little endian with one digit day
+        pass
 
     def test_book_completion(self):
         pass

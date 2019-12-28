@@ -66,19 +66,19 @@ class Test(unittest.TestCase):
         #conventional big endian
         self.assertEqual("2020/12/25", b.print_date(endian='B', year='yyyy', month='mm', day='dd', separator='/', start=True))
         
-        #big endian with a weekday
+        #big endian with a weekday (weekday goes after...)
         b.set_date(month=12, day=25, year=2019)
-        self.assertEqual("Wed, 2019/12/25", b.print_date(endian='B', year='yyyy', month='mm', day='dd', weekday='ddd', separator='/', start=True))
-        self.assertEqual("Wednesday, 2019/12/25", b.print_date(endian='B', year='yyyy', month='mm', day='dd', weekday='dddd', separator='/', start=True))
+        self.assertEqual("2019/12/25, Wed", b.print_date(endian='B', year='yyyy', month='mm', day='dd', weekday='ddd', separator='/', start=True))
+        self.assertEqual("2019/12/25, Wednesday", b.print_date(endian='B', year='yyyy', month='mm', day='dd', weekday='dddd', separator='/', start=True))
 
         #big endian with two digit year
         b.set_date(month=12, day=25, year=2020)
         self.assertEqual("20/12/25", b.print_date(endian='B', year='yy', month='mm', day='dd', separator='/', start=True))
         
-        #big endian with three letter month
+        #big endian with three letter month (no commas)
         self.assertEqual("2020 Dec 25", b.print_date(endian='B', year='yyyy', month='mmm', day='dd', separator=' ', start=True))
         
-        #big endian with full month
+        #big endian with full month (no commas)
         self.assertEqual("2020 December 25", b.print_date(endian='B', year='yyyy', month='mmmm', day='dd', separator=' ', start=True))
         
         #big endian with one digit month
@@ -89,17 +89,60 @@ class Test(unittest.TestCase):
         b.set_date(month=9, day=8, year=2020)
         self.assertEqual("2020/09/8", b.print_date(endian='B', year='yyyy', month='mm', day='d', separator='/', start=True))
     
-    def test_little_endian(self):
+    def test_print_little_endian_date(self):
+        b = Book()
+        b.set_date(month=12, day=27, year=2019)
+        
         #convention little endian
-
-        #little endian with a weekday
+        self.assertEqual('27/12/2019', b.print_date(endian='L', year='yyyy', month='mm', day='dd', weekday='', separator='/', start=True)) 
+        
+        #little endian with a weekday (weekday goes before)
+        self.assertEqual('Fri, 27/12/2019', b.print_date(endian='L', year='yyyy', month='mm', day='dd', weekday='ddd', separator='/', start=True)) 
+        self.assertEqual('Friday, 27/12/2019', b.print_date(endian='L', year='yyyy', month='mm', day='dd', weekday='dddd', separator='/', start=True)) 
+        
         #little endian with two digit year
-        #little endian with a three letter month
-        #little endian with full month
-        #little endian with one digit month
-        #little endian with one digit day
-        pass
+        self.assertEqual('27/12/19', b.print_date(endian='L', year='yy', month='mm', day='dd', weekday='', separator='/', start=True))
 
+        #little endian with a three letter month
+        self.assertEqual("27 Dec 2019", b.print_date(endian='L', year='yyyy', month='mmm', day='dd', separator=' ', start=True))
+
+        #little endian with full month
+        self.assertEqual("27 December 2019", b.print_date(endian='L', year='yyyy', month='mmmm', day='dd', separator=' ', start=True))
+
+        #little endian with one digit month
+        b.set_date(month=9, day=8, year=2020)
+        self.assertEqual("08/9/2020", b.print_date(endian='L', year='yyyy', month='m', day='dd', separator='/', start=True))
+        
+        #little endian with one digit day
+        self.assertEqual("8/09/2020", b.print_date(endian='L', year='yyyy', month='mm', day='d', separator='/', start=True))
+    
+    def print_test_middle_endian_date(self):
+        b = Book()
+        b.set_date(month=12, day=27, year=2019)
+        
+        #convention middle endian
+        self.assertEqual('12/27/2019', b.print_date(endian='M', year='yyyy', month='mm', day='dd', weekday='', seperator='/', start=True)) 
+        
+        #little middle with a weekday (weekday goes before)
+        self.assertEqual('Fri, 12/27/2019', b.print_date(endian='M', year='yyyy', month='mm', day='dd', weekday='ddd', seperator='/', start=True)) 
+        self.assertEqual('Friday, 12/27/2019', b.print_date(endian='M', year='yyyy', month='mm', day='dd', weekday='dddd', seperator='/', start=True)) 
+        
+        #middle endian with two digit year
+        self.assertEqual('12/27/19', b.print_date(endian='M', year='yy', month='mm', day='dd', weekday='', separator='/', start=True))
+
+        #middle endian with a three letter month (with comma in middle)
+        self.assertEqual("Dec 27, 2019", b.print_date(endian='M', year='yyyy', month='mmm', day='dd', separator=' ', start=True))
+
+        #middle endian with full month (with comma in middle)
+        self.assertEqual("December 27, 2019", b.print_date(endian='M', year='yyyy', month='mm', day='dd', separator=' ', start=True))
+
+        #middle endian with one digit month
+        b.set_date(month=9, day=8, year=2020)
+        self.assertEqual("9/08/2020", b.print_date(endian='M', year='yyyy', month='m', day='dd', separator='/', start=True))
+        
+        #middle endian with one digit day
+        self.assertEqual("09/8/2020", b.print_date(endian='M', year='yyyy', month='mm', day='d', separator='/', start=True))
+    
     def test_book_completion(self):
         pass
 

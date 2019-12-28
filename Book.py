@@ -2,6 +2,7 @@
 #Kevin Huang
 
 from time import gmtime, strptime, strftime, struct_time
+from calendar import timegm
 
 
 class Book:
@@ -44,6 +45,15 @@ class Book:
         "fanfiction" : "Fanfiction"
         }
 
+    TIME_UNIT = {
+    's' : 'seconds',
+    'min' : 'minutes',
+    'h' : 'hours',
+    'd' : 'days',
+    'w' : 'weeks',
+    'y' : 'years'
+    }
+
     def __init__(self, title : str="Untitled", author : str="Unknown", medium : str="print", notes : str="", completed : bool=False):
         '''Constructs a book with the following parameters
         
@@ -79,7 +89,11 @@ class Book:
 
     def __repr__(self) -> str:
         '''Returns a string that creates the same Book object when evaluated'''
-        return f'Book({self.title}, {self.author}, {self.start_date}, {self.end_date}, {self.medium}, {self.completed}, {self.notes})'
+        return f'Book({self.title}, {self.author})'
+
+    def __str__(self) -> str:
+        '''Returns a string representing a Book'''
+        return f'{self.title}, {self.author}'
 
     def __eq__(self, other):
         '''A Book object is the same as another if they both have the same author and title.'''
@@ -141,23 +155,27 @@ class Book:
         '''
         assert 1 <= month <= 12, 'Argument \'month\' must be a integer from 1 to 12.'
         assert 1 <= day <= 31, 'Argument \'day\' must be an intger from 1 to 31.'
-        assert 0 <= hour <= 23, 'Argument \'hour\' must be an integer from 0 to 24.'
+        assert 0 <= hour <= 23, 'Argument \'hour\' must be an integer from 0 to 23.'
         assert 0 <= minute <= 59, 'Argument \'minute\' must be an integer from 0 to 59'
         assert 0 <= second <=  59, 'Argument \'second\' must be an integer from 0 to 59'
         assert isinstance(start, bool), 'Argument \'start\' must be a bool.'
 
 
-        date = "{:0>2}:{:0>2}:{:0>2}, {:0>2}/{:0>2}/{}".format(hour, minute, second, month, day, year) 
-        new_date = strptime(date, "%H:%M:%S, %m/%d/%Y")
+        date = "{:0>2}:{:0>2}:{:0>2}, {:0>2}/{:0>2}/{}".format(hour, minute, second, month, day, year)
+        
+        try: 
+            new_date = strptime(date, "%H:%M:%S, %m/%d/%Y")
+        except ValueError:
+            print('Date is not valid.')  #maybe see if we can access an actual calendar... otherwise, the interface I would implement would be too error-prone...
+        else:
+            if start == True:
+                if self.end_date == None:
+                    self.start_date = new_date 
+                elif new_date < self.end_date:
+                    self.start_date = new_date
 
-        if start == True:
-            if self.end_date == None:
-                self.start_date = new_date 
-            elif new_date < self.end_date:
-                self.start_date = new_date
-
-        elif start == False and new_date > self.start_date:
-            self.end_date = new_date
+            elif start == False and new_date > self.start_date:
+                self.end_date = new_date
    
     def print_date(self, endian='M', year='yyyy', month='mm', day='dd', weekday='', separator='/', start=True) -> str:
         '''Returns a string representation of the date
@@ -214,13 +232,13 @@ class Book:
             year_string = strftime(year_format, self.start_date)
             month_string = strftime(month_format, self.start_date)
             day_string = strftime(day_format, self.start_date)                #we want the day number in all cases... 
-            weekday_string = strftime(weekday_format, self.start_date) + ', ' if weekday_format != '' else '' 
+            weekday_string = strftime(weekday_format, self.start_date) if weekday_format != '' else '' 
         
         elif self.end_date != None:
             year_string = strftime(year_format, self.end_date)
             month_string = strftime(month_format, self.end_date)
             day_string = strftime(day_format, self.end_date)
-            weekday_string = strftime(weekday_format, self.end_date) + ', ' if weekday_format != '' else '' 
+            weekday_string = strftime(weekday_format, self.end_date)  if weekday_format != '' else '' 
 
         #to change the length of the day or month to 1
         if month == 'm':
@@ -231,15 +249,20 @@ class Book:
         #order it based on endian
         if endian == 'B':
             #modify the date_string based on the seperator...
-            date_string = weekday_string + year_string + separator + month_string + separator + day_string
+            date_string = year_string + separator + month_string + separator + day_string
+            if weekday != '':
+                date_string += ', ' + weekday_string
 
         elif endian == 'L':
-            date_string = weekday_string + day_string + separator + month_string + separator + year_string
-
+            date_string =  day_string + separator + month_string + separator + year_string
+            if weekday != '':
+                date_string = weekday_string + ', ' + date_string
+        
         elif endian == 'M':
-            date_string = weekday_string + month_string + separator + day_string + separator + year_string
-       
-        print(date_string) #DEBUG 
+            date_string =  month_string + separator + day_string + separator + year_string
+            if weekday != '':
+                date_string = weekday_string + ', ' + date_string
+ 
         return date_string
         
     
@@ -270,3 +293,10 @@ class Book:
     def get_end_date(self) -> struct_time:
         '''returns when the user has finished the book'''
         return self.end_date if self.completed else None 
+
+    def get_time_read(self, unit: str='s') -> int:
+        '''returns time spent reading the book in a given unit'''
+        if self.end_date == None:
+            return timegm(gmtime()) - timegm(self.start_date)
+        else:
+            return timegm(gmtime()) 

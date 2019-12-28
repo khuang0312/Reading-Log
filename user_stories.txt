@@ -1,9 +1,12 @@
 Finished:
 When I add a book to my log, I should be able to say the title of the book, who wrote the book, and whether it's a picture, print, comic, or audio book.
+Need to prevent the user from setting a end date that is before a start date. (using comparison operators between struct_time objects)
+I should be able to modify the title, author, medium, date started, date finished, the notes, and the completion status of the book.
 
 Problems:
-Need to prevent the user from using erroneous values to set the dates.
-Need to prevent the user from setting a end date that is before a start date.
+Need to prevent the user from using erroneous values to set the dates. (perhaps use the calendar library????) (Do I need to limit the year to 1970 to 2060?)
+
+Can't figure out how to get the difference between two times in an optimal manner...
 
 What happens if the user puts multiple occurences of the same book? Should it be counted?
  Multiple occurrences of the same book can be in the same log; however, the second and subsequent occurrences are not counted toward the total count of books read.
@@ -11,8 +14,6 @@ What happens if the user puts multiple occurences of the same book? Should it be
 In-Progress:
 When I look at a book in my log, I should be able to see the date I started reading it, the date I finished reading it, how long I have spent reading it in seconds, and
 any other notes that I have written about the book.
-
-I should be able to modify the title, author, medium, date started, date finished, time spent, the notes, and the completion status of the book.
 
 I should be able to add new books to my list.
 

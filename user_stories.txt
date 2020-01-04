@@ -5,8 +5,10 @@ I should be able to modify the title, author, medium, date started, date finishe
 
 Problems:
 Need to prevent the user from using erroneous values to set the dates. (perhaps use the calendar library????) (Do I need to limit the year to 1970 to 2060?)
+    We can use the calendar libary to check validity...
 
 Can't figure out how to get the difference between two times in an optimal manner...
+    We need to use the date time library...
 
 What happens if the user puts multiple occurences of the same book? Should it be counted?
  Multiple occurrences of the same book can be in the same log; however, the second and subsequent occurrences are not counted toward the total count of books read.
@@ -30,11 +32,15 @@ I should be able to see the following analytics...
   Total books read within a certain period (week, month, year, 2 years, all time)
   Total time spent within a certain period (week, month, year, 2 years, all time)
 
+Matplotlib is perfect...
+
 If I put my name and a given time period, the program should give me a list of books that I have read within that time period.
 
 I should be able to transfer the data to another instance of this program.
 
 The program should be able to read from a CSV file and create a reading log based off of that.
+
+CSV library...
 
 I should be able to get a nice readout of my data, so I can share with my friends what books I have read.
 

@@ -4,6 +4,8 @@
 from time import gmtime, strptime, strftime, struct_time
 from calendar import timegm
 
+#prepare to reimplement this program with the datetime and calendar libaries which are far more reliable....
+#prevent the 2038 issue!!!
 
 class Book:
     #DATE_FORMAT is a static variable made to help format the date that a book is read

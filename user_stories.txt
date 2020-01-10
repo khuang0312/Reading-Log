@@ -1,17 +1,14 @@
 Finished:
-When I add a book to my log, I should be able to say the title of the book, who wrote the book, and whether it's a picture, print, comic, or audio book.
-Need to prevent the user from setting a end date that is before a start date. (using comparison operators between struct_time objects)
-I should be able to modify the title, author, medium, date started, date finished, the notes, and the completion status of the book.
+-When I add a book to my log, I should be able to say the title of the book, who wrote the book, and whether it's a picture, print, comic, or audio book.
+-Need to prevent the user from setting a end date that is before a start date. (using comparison operators between struct_time objects)
+-I should be able to modify the title, author, medium, date started, date finished, the notes, and the completion status of the book.
+-User can't really use erroneous values because the datetime function doesn't allow one to use invalid values...
+-We can get the difference between two times thanks to timedeltas from the datetime library.
+-Multiple occurrences of the same book can be in the same log; however, the second and subsequent occurrences are not counted toward the total count of books read.
 
 Problems:
-Need to prevent the user from using erroneous values to set the dates. (perhaps use the calendar library????) (Do I need to limit the year to 1970 to 2060?)
-    We can use the calendar libary to check validity...
+-We need a timestamp printer and a way to harness the values from the subtraction of the start time from the end time.
 
-Can't figure out how to get the difference between two times in an optimal manner...
-    We need to use the date time library...
-
-What happens if the user puts multiple occurences of the same book? Should it be counted?
- Multiple occurrences of the same book can be in the same log; however, the second and subsequent occurrences are not counted toward the total count of books read.
 
 In-Progress:
 When I look at a book in my log, I should be able to see the date I started reading it, the date I finished reading it, how long I have spent reading it in seconds, and

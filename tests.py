@@ -61,37 +61,35 @@ class Test(unittest.TestCase):
                
     def test_print_big_endian_date(self):
         b = Book()
-        b.set_date(month=12, day=25, year=2020)
+        b.set_date(2019, 12, 25)
         
         #conventional big endian
-        self.assertEqual("2020/12/25", b.print_date(endian='B', year='yyyy', month='mm', day='dd', separator='/', start=True))
+        self.assertEqual("2019/12/25", b.print_date(endian='B', year='yyyy', month='mm', day='dd', separator='/', start=True))
         
         #big endian with a weekday (weekday goes after...)
-        b.set_date(month=12, day=25, year=2019)
         self.assertEqual("2019/12/25, Wed", b.print_date(endian='B', year='yyyy', month='mm', day='dd', weekday='ddd', separator='/', start=True))
         self.assertEqual("2019/12/25, Wednesday", b.print_date(endian='B', year='yyyy', month='mm', day='dd', weekday='dddd', separator='/', start=True))
 
         #big endian with two digit year
-        b.set_date(month=12, day=25, year=2020)
-        self.assertEqual("20/12/25", b.print_date(endian='B', year='yy', month='mm', day='dd', separator='/', start=True))
+        self.assertEqual("19/12/25", b.print_date(endian='B', year='yy', month='mm', day='dd', separator='/', start=True))
         
         #big endian with three letter month (no commas)
-        self.assertEqual("2020 Dec 25", b.print_date(endian='B', year='yyyy', month='mmm', day='dd', separator=' ', start=True))
+        self.assertEqual("2019 Dec 25", b.print_date(endian='B', year='yyyy', month='mmm', day='dd', separator=' ', start=True))
         
         #big endian with full month (no commas)
-        self.assertEqual("2020 December 25", b.print_date(endian='B', year='yyyy', month='mmmm', day='dd', separator=' ', start=True))
+        self.assertEqual("2019 December 25", b.print_date(endian='B', year='yyyy', month='mmmm', day='dd', separator=' ', start=True))
         
         #big endian with one digit month
-        b.set_date(month=9, day=8, year=2020) 
-        self.assertEqual("2020/9/08", b.print_date(endian='B', year='yyyy', month='m', day='dd', separator='/', start=True))
+        b.set_date(month=9, day=8, year=2019) 
+        self.assertEqual("2019/9/08", b.print_date(endian='B', year='yyyy', month='m', day='dd', separator='/', start=True))
         
         #big endian with one digit day
-        b.set_date(month=9, day=8, year=2020)
-        self.assertEqual("2020/09/8", b.print_date(endian='B', year='yyyy', month='mm', day='d', separator='/', start=True))
+        b.set_date(month=9, day=8, year=2019)
+        self.assertEqual("2019/09/8", b.print_date(endian='B', year='yyyy', month='mm', day='d', separator='/', start=True))
     
     def test_print_little_endian_date(self):
         b = Book()
-        b.set_date(month=12, day=27, year=2019)
+        b.set_date(2019, 12, 27)
         
         #convention little endian
         self.assertEqual('27/12/2019', b.print_date(endian='L', year='yyyy', month='mm', day='dd', weekday='', separator='/', start=True)) 
@@ -110,11 +108,11 @@ class Test(unittest.TestCase):
         self.assertEqual("27 December 2019", b.print_date(endian='L', year='yyyy', month='mmmm', day='dd', separator=' ', start=True))
 
         #little endian with one digit month
-        b.set_date(month=9, day=8, year=2020)
-        self.assertEqual("08/9/2020", b.print_date(endian='L', year='yyyy', month='m', day='dd', separator='/', start=True))
+        b.set_date(2019, 9, 8)
+        self.assertEqual("08/9/2019", b.print_date(endian='L', year='yyyy', month='m', day='dd', separator='/', start=True))
         
         #little endian with one digit day
-        self.assertEqual("8/09/2020", b.print_date(endian='L', year='yyyy', month='mm', day='d', separator='/', start=True))
+        self.assertEqual("8/09/2019", b.print_date(endian='L', year='yyyy', month='mm', day='d', separator='/', start=True))
     
     def print_test_middle_endian_date(self):
         b = Book()

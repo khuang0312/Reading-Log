@@ -1,8 +1,16 @@
 #This module contains the Book class which describes each book in a user's reading list.
 #Kevin Huang
 
-from time import gmtime, strptime, strftime, struct_time
-from calendar import timegm
+#importing the datetime class
+from time import strftime
+from datetime import datetime
+from dateutil import tz
+
+
+#in progress
+#check set_date (What's up with fold argument? Does it actually convert a local time to its UTC time?)
+#print_date
+#get_time_read
 
 #prepare to reimplement this program with the datetime and calendar libaries which are far more reliable....
 #prevent the 2038 issue!!!
@@ -78,12 +86,17 @@ class Book:
         
         self.title = title
         self.author = author
-        self.start_date = gmtime()
+
+        #we initialize the start date with the current date in UTC format
+        self.start_date = datetime.now(tz.UTC) 
         
+        # if a new book is "completed"
         if completed: 
-            self.end_date = self.start_date  #the end date is the start date in case a new Book is created with completed being true...
+            self.end_date = self.start_date
+        
+        # if a new book is "not completed"
         else:
-            self.end_date = None             #the end date is none in all other circumstances...
+            self.end_date = None
 
         self.medium = medium
         self.notes = notes
@@ -131,14 +144,14 @@ class Book:
     def set_completed(self):
         '''Sets a book's completion status to True and sets the end time to the time when this method is called'''
         self.completed = True
-        self.end_date = gmtime()
+        self.end_date = datetime.now(tz.UTC) 
     
-    def set_incomplete(self):
+    def set_incompleted(self):
         '''Sets a book's completion status to False and resets the end time back to None'''
         self.completed = False
         self.end_time = None
     
-    def set_date(self, month: int=1, day : int=1, year : int=1, hour : int=0, minute: int=0, second: int=0, start : bool=True):
+    def set_date(self, year : int, month : int, day : int, hour : int=0, minute : int=0, second : int=0, start : bool=True):
         '''Sets either a book's start date or end date to a new one.
             
            If start is True, this will change the starting date. Otherwise, the ending date.
@@ -155,31 +168,38 @@ class Book:
            January 1st, 2020, 12:00:00AM
            January 1st, 2020, 00:00:00
         '''
-        assert 1 <= month <= 12, 'Argument \'month\' must be a integer from 1 to 12.'
-        assert 1 <= day <= 31, 'Argument \'day\' must be an intger from 1 to 31.'
-        assert 0 <= hour <= 23, 'Argument \'hour\' must be an integer from 0 to 23.'
-        assert 0 <= minute <= 59, 'Argument \'minute\' must be an integer from 0 to 59'
-        assert 0 <= second <=  59, 'Argument \'second\' must be an integer from 0 to 59'
-        assert isinstance(start, bool), 'Argument \'start\' must be a bool.'
 
+        try:
+            #creating a datetime object in local time
+            date = datetime(year, month, day, hour, minute, second, microsecond=0, tzinfo=tz.gettz(), fold=0)
 
-        date = "{:0>2}:{:0>2}:{:0>2}, {:0>2}/{:0>2}/{}".format(hour, minute, second, month, day, year)
-        
-        try: 
-            new_date = strptime(date, "%H:%M:%S, %m/%d/%Y")
         except ValueError:
-            print('Date is not valid.')  #maybe see if we can access an actual calendar... otherwise, the interface I would implement would be too error-prone...
+            print("Arguments are of an invalid type or are invalid values...")
+        
         else:
-            if start == True:
-                if self.end_date == None:
-                    self.start_date = new_date 
-                elif new_date < self.end_date:
-                    self.start_date = new_date
+            #convert custom date to UTC...
+            utc_date = date.astimezone(tz=tz.UTC)
 
-            elif start == False and new_date > self.start_date:
-                self.end_date = new_date
+            #present_date is the current time in UTC...
+            present_date = datetime.now(tz.UTC) 
+            
+            #if we're replacing the start date
+            if start == True:
+                #if there's no end date, the start date should be at latest today's date...
+                if self.end_date == None:
+                    if utc_date < present_date:
+                        self.start_date = utc_date
+
+                #if there's an end date, the start date just has to be earlier than the end_date...
+                elif utc_date < self.end_date:
+                    self.start_date = utc_date
+            
+            #if we're replacing the end date... the end date should be later than start_date
+            elif start == False and utc_date > self.start_date:
+                self.end_date = utc_date
+
    
-    def print_date(self, endian='M', year='yyyy', month='mm', day='dd', weekday='', separator='/', start=True) -> str:
+    def print_date(self, endian : str='M', year : str='yyyy', month : str='mm', day : str='dd', weekday : str='', separator : str='/', start : bool=True) -> str:
         '''Returns a string representation of the date
         
         Keyword arugments:
@@ -218,6 +238,7 @@ class Book:
         True - start date of the book
         False - end date of the book
         '''
+        
         assert endian in Book.ENDIAN_FORMAT, 'Argument \'endian\' must be either \'B\', \'M\', or \'L\'. '
         assert year in Book.YEAR_FORMAT, 'Argument \'year\' must be either \'yy\' or \'yyyy\'.'
         assert month in Book.MONTH_FORMAT, 'Argument \'month\' must be either \'mmmm\', \'mmm\', \'mm\', or \'m\'.'
@@ -229,18 +250,19 @@ class Book:
         month_format = Book.MONTH_FORMAT[month]
         day_format = Book.DAY_FORMAT[day]
         weekday_format = Book.WEEKDAY_FORMAT[weekday]
-        
+
         if start == True:
-            year_string = strftime(year_format, self.start_date)
-            month_string = strftime(month_format, self.start_date)
-            day_string = strftime(day_format, self.start_date)                #we want the day number in all cases... 
-            weekday_string = strftime(weekday_format, self.start_date) if weekday_format != '' else '' 
+            year_string = self.start_date.strftime(year_format)
+            month_string = self.start_date.strftime(month_format)
+            day_string = self.start_date.strftime(day_format)   #we want the day number in all cases... 
+            weekday_string = self.start_date.strftime(weekday_format) if weekday_format != '' else ''
         
+        #if the start_date is False, it still doesn't matter if the end_date isn't there
         elif self.end_date != None:
-            year_string = strftime(year_format, self.end_date)
-            month_string = strftime(month_format, self.end_date)
-            day_string = strftime(day_format, self.end_date)
-            weekday_string = strftime(weekday_format, self.end_date)  if weekday_format != '' else '' 
+            year_string = self.end_date.strftime(year_format)
+            month_string = self.end_date.strftime(month_format)
+            day_string = self.end_date.strftime(day_format)
+            weekday_string = self.end_date.strftime(weekday_format)  if weekday_format != '' else '' 
 
         #to change the length of the day or month to 1
         if month == 'm':
@@ -266,6 +288,27 @@ class Book:
                 date_string = weekday_string + ', ' + date_string
  
         return date_string
+    
+    def print_timestamp(seconds : bool=False, military : bool=True utc : bool=False) -> str:
+        '''returns the timestamp in a string
+        
+           seconds - will show seconds if True; otherwise not
+           military - will show time in 24 hour format if True; otherwise 12 hours
+           utc - will show time in UTC format if True; otherwise it will use local time zone
+        
+           If the time is 1:00:13AM, Pacific Standard Time
+           
+           Default:
+           01:00:13
+
+           Seconds:
+           01
+
+           REFER TO ISO_6801 for more info...
+        
+        '''
+        pass
+
         
     
     def get_title(self) -> str:
@@ -288,17 +331,17 @@ class Book:
         '''returns whether the book has been completed'''
         return self.completed
 
-    def get_start_date(self) -> struct_time:
+    def get_start_date(self) -> datetime:
         '''returns when the user started reading the book'''
         return self.start_date
 
-    def get_end_date(self) -> struct_time:
+    def get_end_date(self) -> datetime:
         '''returns when the user has finished the book'''
         return self.end_date if self.completed else None 
 
     def get_time_read(self, unit: str='s') -> int:
         '''returns time spent reading the book in a given unit'''
         if self.end_date == None:
-            return timegm(gmtime()) - timegm(self.start_date)
+            return datetime.now(tz.UTC) - self.start_date
         else:
-            return timegm(gmtime()) 
+            return self.end_date - self.start_date

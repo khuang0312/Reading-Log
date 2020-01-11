@@ -5,20 +5,21 @@ Finished:
 -User can't really use erroneous values because the datetime function doesn't allow one to use invalid values...
 -We can get the difference between two times thanks to timedeltas from the datetime library.
 -Multiple occurrences of the same book can be in the same log; however, the second and subsequent occurrences are not counted toward the total count of books read.
+-We have a timestamp printer and a way to harness the values from the subtraction of the start time from the end time using the timedeltas in the datetime library...
+    -When I look at a book in my log, I should be able to see the date I started reading it, the date I finished reading it, how long I have spent reading it in seconds, and
+        any other notes that I have written about the book.
+
+
 
 Problems:
--We need a timestamp printer and a way to harness the values from the subtraction of the start time from the end time.
+
 
 
 In-Progress:
-When I look at a book in my log, I should be able to see the date I started reading it, the date I finished reading it, how long I have spent reading it in seconds, and
-any other notes that I have written about the book.
-
 I should be able to add new books to my list.
-
 I should be able to delete books from my list.
-
 I should be able to check which books I am still reading and which books I have finished.
+If I put my name and a given time period, the program should give me a list of books that I have read within that time period.
 
 I should be able to see the following analytics...
   The medium percentages
@@ -31,15 +32,12 @@ I should be able to see the following analytics...
 
 Matplotlib is perfect...
 
-If I put my name and a given time period, the program should give me a list of books that I have read within that time period.
 
 I should be able to transfer the data to another instance of this program.
 
 The program should be able to read from a CSV file and create a reading log based off of that.
 
 CSV library...
-
 I should be able to get a nice readout of my data, so I can share with my friends what books I have read.
-
 I should be able to purge all data.
 

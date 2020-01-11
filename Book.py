@@ -56,13 +56,15 @@ class Book:
         }
 
     TIME_UNIT = {
-    's' : 'seconds',
-    'min' : 'minutes',
-    'h' : 'hours',
-    'd' : 'days',
-    'w' : 'weeks',
-    'y' : 'years'
+        '24h'     : '%H',    # 24 hour
+        '12h'     : '%I',    # 12 hour
+        'mm'      : '%M',    # minutes
+        'ss'      : '%S',    # seconds
+        'AMPM'    : '%p',    # AM or PM
+        'tz'      : '%Z'     # Time zone name
     }
+
+    
 
     def __init__(self, title : str="Untitled", author : str="Unknown", medium : str="print", notes : str="", completed : bool=False):
         '''Constructs a book with the following parameters
@@ -149,7 +151,7 @@ class Book:
     def set_incompleted(self):
         '''Sets a book's completion status to False and resets the end time back to None'''
         self.completed = False
-        self.end_time = None
+        self.end_date = None
     
     def set_date(self, year : int, month : int, day : int, hour : int=0, minute : int=0, second : int=0, start : bool=True):
         '''Sets either a book's start date or end date to a new one.
@@ -283,13 +285,15 @@ class Book:
                 date_string = weekday_string + ', ' + date_string
         
         elif endian == 'M':
-            date_string =  month_string + separator + day_string + separator + year_string
+            date_string =  month_string + separator + day_string + ',' + separator + year_string  if month in ['mmmm', 'mmm'] else\
+                month_string + separator + day_string + separator + year_string
+                
             if weekday != '':
                 date_string = weekday_string + ', ' + date_string
  
         return date_string
     
-    def print_timestamp(seconds : bool=False, military : bool=True utc : bool=False) -> str:
+    def print_timestamp(self, hour_truncated : bool=False, seconds : bool=False, military : bool=True, utc : bool=False, separator : str=':', start=True) -> str:
         '''returns the timestamp in a string
         
            seconds - will show seconds if True; otherwise not
@@ -299,17 +303,59 @@ class Book:
            If the time is 1:00:13AM, Pacific Standard Time
            
            Default:
-           01:00:13
+           01:00 PST
 
-           Seconds:
-           01
+           Hour_truncates = True
+           1:00:13 PST
 
-           REFER TO ISO_6801 for more info...
+           Seconds = True
+           01:00:13 PST
+
+           Military = False
+           01:00 AM PST
+
+           UTC = True
+           09:00 AM UTC
+           
+            '24h'     : '%H',    # 24 hour
+            '12h'     : '%I',    # 12 hour
+            'mm'      : '%M',    # minutes
+            'ss'      : '%S',    # seconds
+            'AMPM'    : '%p',    # AM or PM
+            'tz'      : '%z'     # Time zone name
         
         '''
-        pass
+        #deciding to give the start time or the end time...
+        if start == True:
+            date = self.start_date
+          
+        elif start == False:
+            date = self.end_date
 
+        #changes the timezone to local time if utc is False
+        if utc == False:
+            date = date.astimezone(tz=tz.tzlocal())
         
+        #changing between 24 and 12 hour time and determining the AM or PM
+        if military == True:
+            hour_string = date.strftime(Book.TIME_UNIT['24h'])
+            ampm_string = ''
+        elif military == False:
+            hour_string = date.strftime(Book.TIME_UNIT['12h'])
+            ampm_string = ' ' + date.strftime(Book.TIME_UNIT['AMPM'])
+
+        minute_string = date.strftime(Book.TIME_UNIT['mm'])
+        second_string = separator + date.strftime(Book.TIME_UNIT['ss']) if seconds else ''
+
+        #truncating hours
+        if hour_truncated == True and int(hour_string) < 10:
+            hour_string = hour_string[1]
+        
+        #preparing the time zone name
+        tz_string = ' ' + date.strftime(Book.TIME_UNIT['tz'])
+
+        return hour_string + separator + minute_string + second_string + ampm_string + tz_string       
+            
     
     def get_title(self) -> str:
         '''returns the title of the book'''
@@ -339,9 +385,44 @@ class Book:
         '''returns when the user has finished the book'''
         return self.end_date if self.completed else None 
 
-    def get_time_read(self, unit: str='s') -> int:
-        '''returns time spent reading the book in a given unit'''
+    def get_time_read(self, unit: str='seconds') -> int:
+        '''returns time spent reading the book in a given unit
+
+            this doesn't give the true amount of months, weeks, years...
+            in the time span, mainly an approximation that should suffice...
+
+            arguments supported:
+            seconds
+            minutes
+            hours
+            days
+            weeks
+            months
+            years         
+        '''
+
         if self.end_date == None:
-            return datetime.now(tz.UTC) - self.start_date
+            time_span = datetime.now(tz.UTC) - self.start_date
         else:
-            return self.end_date - self.start_date
+            time_span = self.end_date - self.start_date
+
+        if unit == "seconds":
+            return time_span.seconds
+        
+        elif unit == "hours":
+            return time_span.seconds // 60
+        
+        elif unit == "hours":
+            return time_span.seconds // 360
+
+        elif unit == "days":
+            return time_span.days
+
+        elif unit == "weeks":
+            return time_span.days // 7
+
+        elif unit == "months":
+            return time_span.days // 30
+
+        elif unit == "years":
+            return time_span.days // 365

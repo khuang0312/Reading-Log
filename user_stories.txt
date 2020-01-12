@@ -19,6 +19,8 @@ In-Progress:
 I should be able to add new books to my list.
 I should be able to delete books from my list.
 I should be able to check which books I am still reading and which books I have finished.
+I should be able to sort by title, author, genre, etc.
+I should be able to use commands to add books quickly and sort quickly.
 If I put my name and a given time period, the program should give me a list of books that I have read within that time period.
 
 I should be able to see the following analytics...

@@ -7,14 +7,6 @@ from datetime import datetime
 from dateutil import tz
 
 
-#in progress
-#check set_date (What's up with fold argument? Does it actually convert a local time to its UTC time?)
-#print_date
-#get_time_read
-
-#prepare to reimplement this program with the datetime and calendar libaries which are far more reliable....
-#prevent the 2038 issue!!!
-
 class Book:
     #DATE_FORMAT is a static variable made to help format the date that a book is read
 
@@ -265,6 +257,14 @@ class Book:
             month_string = self.end_date.strftime(month_format)
             day_string = self.end_date.strftime(day_format)
             weekday_string = self.end_date.strftime(weekday_format)  if weekday_format != '' else '' 
+        
+        #gives present date if start is false and end_date is None
+        elif self.end_date == None:
+            present_date = datetime.now(tz.UTC)
+            year_string = present_date.strftime(year_format)
+            month_string = present_date.strftime(month_format)
+            day_string = present_date.strftime(day_format)
+            weekday_string = present_date.end_date.strftime(weekday_format)  if weekday_format != '' else ''
 
         #to change the length of the day or month to 1
         if month == 'm':
@@ -375,7 +375,7 @@ class Book:
 
     def get_completed(self) -> bool:
         '''returns whether the book has been completed'''
-        return self.completed
+        return self.completed 
 
     def get_start_date(self) -> datetime:
         '''returns when the user started reading the book'''
